@@ -34,7 +34,7 @@ made.by = "A. Clifton, NREL"
 data.public = TRUE
 
 # Reanalyze existing data?
-data.analyze.raw = FALSE
+data.analyze.raw = TRUE
 
 # Do not load versions of the tool before...
 # will be ignored if "" is used
