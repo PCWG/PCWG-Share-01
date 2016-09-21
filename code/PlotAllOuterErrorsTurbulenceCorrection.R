@@ -28,10 +28,14 @@ PlotAllOuterErrorsTurbulenceCorrection <- function(df,
   
   # continue if we have data
   if (NROW(df)>0){
-    # create the plot label
-    plot.label <- labelAggregate(as.character(NROW(unique(df$data.file))),
-                                 df$sw.version,
-                                 made.by)
+    
+    # create the plot labels
+    plot.title <- "Outer Range Normalized Error"
+    n.lines <- NROW(unique(df$data.file))
+    plot.subtitle <- paste0(n.lines, " data sets found.")
+    plot.caption <- labelAggregate(as.character(NROW(unique(df$data.file))),
+                                   df$sw.version,
+                                   made.by)
     
     # get the data we want
     df <- df[((df$correction == "Baseline") | (df$correction == "Turbulence Correction")) &
@@ -66,10 +70,12 @@ PlotAllOuterErrorsTurbulenceCorrection <- function(df,
                         palette= 7,
                         drop = TRUE,
                         name = "Corrections") +
-      ggtitle("Outer Range Normalized Error")
+      labs(title = plot.title) +
+      labs(subtitle = plot.subtitle) + 
+      labs(caption=plot.caption)
+    
     
     print(p)
-    makeFootnote(plot.label)
     
     if (sw.version == ""){
       filename = paste0("OuterRangeTurbulenceCorrectionHistogram_allSWversions.png")
@@ -80,18 +86,15 @@ PlotAllOuterErrorsTurbulenceCorrection <- function(df,
                         ".png")
     }
     
-    png(filename = file.path(output.dir,
-                             filename),
-        width = 6, 
-        height = 4, 
-        units = "in", 
-        pointsize = 10, 
-        res = 300,
-        bg = "white")
-    print(p)
-    makeFootnote(plot.label,
-                 base.size = 6)
-    dev.off()
+    # save the figure
+    ggsave(filename = file.path(output.dir,
+                                filename),
+           plot = p,
+           width = 6, 
+           height = 4, 
+           units = "in", 
+           dpi = 300)
+    
   } else {
     message("No data found with the requested software version")
   }

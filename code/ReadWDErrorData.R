@@ -1,4 +1,4 @@
-ReadWDErrorData <- function(wb,sheet){
+ReadWDErrorData <- function(wb,sheet,sv){
   # reads a PCWG Share 01 file and returns data about the baseline accuracy
   #
   # Args:
@@ -9,12 +9,16 @@ ReadWDErrorData <- function(wb,sheet){
   
   require(XLConnect)
   setMissingValue(wb," ")
-  
+  # figure out the starting row
+  if(compareVersion(VersionStr(sv),
+                    "0.5.8") <= 0){sr = 19}
+  if(compareVersion(VersionStr(sv),
+                    "0.5.8") > 0){sr = 27}
   # get data...
   # By normalized wind speed bin
   bin = paste(as.character(readWorksheet(wb,
                                          sheet = sheet,
-                                         region = "D19:AM19",
+                                         region = paste0("D",sr,":AM", sr),
                                          header = FALSE,
                                          autofitCol = FALSE,
                                          autofitRow= FALSE)),
@@ -22,7 +26,7 @@ ReadWDErrorData <- function(wb,sheet){
               sep=" ")
   data.count = paste(as.character(readWorksheet(wb,
                                                 sheet = sheet,
-                                                region = "D20:AM20",
+                                                region = paste0("D",sr+1,":AM", sr+1),
                                                 header = FALSE,
                                                 autofitCol = FALSE,
                                                 autofitRow= FALSE)),
@@ -30,7 +34,7 @@ ReadWDErrorData <- function(wb,sheet){
                      sep=" ")
   NME = paste(as.character(readWorksheet(wb,
                                          sheet = sheet,
-                                         region = "D21:AM21",
+                                         region = paste0("D",sr+2,":AM", sr+2),
                                          header = FALSE,
                                          autofitCol = FALSE,
                                          autofitRow= FALSE)),
@@ -38,7 +42,7 @@ ReadWDErrorData <- function(wb,sheet){
               sep=" ")
   NMAE = paste(as.character(readWorksheet(wb,
                                           sheet = sheet,
-                                          region = "D21:AM21",
+                                          region = paste0("D",sr+3,":AM", sr+3),
                                           header = FALSE,
                                           autofitCol = FALSE,
                                           autofitRow= FALSE)),

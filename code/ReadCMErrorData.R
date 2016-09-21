@@ -1,4 +1,4 @@
-ReadCMErrorData <- function(wb,sheet){
+ReadCMErrorData <- function(wb,sheet,sv){
   # reads a PCWG Share 01 file and returns data about the error
   #
   # Args:
@@ -9,12 +9,17 @@ ReadCMErrorData <- function(wb,sheet){
   
   require(XLConnect)
   setMissingValue(wb," ")
+  # figure out the starting row
+  if(compareVersion(VersionStr(sv),
+                    "0.5.8") <= 0){sr = 15}
+  if(compareVersion(VersionStr(sv),
+                    "0.5.8") > 0){sr = 23}
   
   # get data...
   # By calendar month
   bin = paste(as.character(readWorksheet(wb,
                                          sheet = sheet,
-                                         region = "D15:O15",
+                                         region = paste0("D",sr,":O", sr),
                                          header = FALSE,
                                          autofitCol = FALSE,
                                          autofitRow= FALSE)),
@@ -22,7 +27,7 @@ ReadCMErrorData <- function(wb,sheet){
               sep=" ")
   data.count = paste(as.character(readWorksheet(wb,
                                                 sheet = sheet,
-                                                region = "D16:O16",
+                                                region = paste0("D",sr+1,":O", sr+1),
                                                 header = FALSE,
                                                 autofitCol = FALSE,
                                                 autofitRow= FALSE)),
@@ -30,7 +35,7 @@ ReadCMErrorData <- function(wb,sheet){
                      sep=" ")
   NME = paste(as.character(readWorksheet(wb,
                                          sheet = sheet,
-                                         region = "D17:O17",
+                                         region = paste0("D",sr+2,":O", sr+2),
                                          header = FALSE,
                                          autofitCol = FALSE,
                                          autofitRow= FALSE)),
@@ -38,7 +43,7 @@ ReadCMErrorData <- function(wb,sheet){
               sep=" ")
   NMAE = paste(as.character(readWorksheet(wb,
                                           sheet = sheet,
-                                          region = "D18:O18",
+                                          region = paste0("D",sr+3,":O", sr+3),
                                           header = FALSE,
                                           autofitCol = FALSE,
                                           autofitRow= FALSE)),

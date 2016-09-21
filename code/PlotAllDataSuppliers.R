@@ -1,10 +1,10 @@
-PlotAllDataSources <- function(df,
-                               sw.version = "",
-                               sw.version.logic = "equals",
-                               ouput.dir = file.path(getwd(),'analysis','all'),
-                               made.by = ""){
+PlotAllDataSuppliers <- function(df,
+                                 sw.version = "",
+                                 sw.version.logic = "equals",
+                                 ouput.dir = file.path(getwd(),'analysis','all'),
+                                 made.by = ""){
   
-  # plots baseline errors
+  # plots summary of who contributed data
   #
   # Args:
   # *.error summary of errors
@@ -18,7 +18,7 @@ PlotAllDataSources <- function(df,
   oldw <- getOption("warn")
   options(warn = -1)
   
-  # get the maximum number of tests in any one country
+  # get the maximum number of tests for any one data supplier
   nmax <- max(aggregate(cbind(count = data.type)~data.supplier.type,
                         data = df[!(is.na(df$data.supplier.type)),],
                         FUN = length)$count,
@@ -35,20 +35,30 @@ PlotAllDataSources <- function(df,
   }
   
   # continue if we have data
-  if (NROW(df)>0){
+  if ((NROW(df)>0) &
+      (any(nchar(df$data.supplier.type)>0,na.rm = TRUE))){
     
-    # create the plot label
-    plot.label <- labelAggregate(as.character(NROW(df)),
+    # get the number of datasets
+    n.lines <- NROW(unique(df$data.file))
+    # create the plot title
+    plot.title <- "Data Suppliers"
+    # create the plot subtitle
+    plot.subtitle <- paste0(n.lines,
+                            " data sets found.")
+    # create the plot caption
+    plot.caption <- labelAggregate(as.character(NROW(df)),
                                  df$sw.version,
                                  made.by)
-    
     # plot
     p <- ggplot(data = df,
                 aes(x = data.supplier.type)) +
-      geom_histogram() +
+      geom_bar(stat="count") +
       scale_x_discrete(drop = FALSE,
-                       name = "Data Sources") +
-      scale_y_continuous(name = "Count")
+                       name = "Data Suppliers") +
+      scale_y_continuous(name = "Count") +
+      labs(title = plot.title) +
+      labs(subtitle = plot.subtitle) +
+      labs(caption=plot.caption) 
     
     if (sw.version.logic == "equals"){
       
@@ -58,8 +68,8 @@ PlotAllDataSources <- function(df,
         scale_fill_discrete(name = "Software\nVersion")
     }
     
+    # need to generate plot for knitr to work.
     print(p)
-    makeFootnote(plot.label)
     
     if (sw.version == ""){
       filename = paste0("DataSources_allSWversions.png")
@@ -70,20 +80,16 @@ PlotAllDataSources <- function(df,
                         ".png")
     }
     
-    png(filename = file.path(output.dir,
-                             filename),
-        width = 6, 
-        height = 4, 
-        units = "in", 
-        pointsize = 10, 
-        res = 300,
-        bg = "white")
-    print(p)
-    makeFootnote(plot.label,
-                 base.size = 6)
-    dev.off()
+    ggsave(filename = file.path(output.dir,
+                                filename),
+           plot = p,
+           width = 6, 
+           height = 4, 
+           units = "in", 
+           dpi = 300)
+    
   } else {
-    message("No data found with the requested software version")
+    message("No usable data found with the requested software version")
   }
   
   # turn warnings back on

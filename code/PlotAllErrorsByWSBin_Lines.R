@@ -35,10 +35,10 @@ PlotAllErrorsByWSBin_Lines <- function(df,
   # continue if we have data
   if (NROW(df)>0){
     
-    # create the plot label
-    plot.label <- labelAggregate(as.character(NROW(unique(df$data.file))),
-                                 df$sw.version,
-                                 made.by)
+    # create the plot caption
+    plot.caption <- labelAggregate(as.character(NROW(unique(df$data.file))),
+                                   df$sw.version,
+                                   made.by)
     
     # create a bin label
     df$x.label <- factor(x = paste0(df$x.min, "-",df$x.max),
@@ -60,29 +60,63 @@ PlotAllErrorsByWSBin_Lines <- function(df,
       lines.palette <- colorRampPalette(brewer.pal(8,"Paired"))(n.lines)
       
       # plot boxplots
-      plot.title <- paste0("Error By Wind Speed Bin for ", data.range, " Data")
-      plot.subtitle <- paste0("Using ", correction, ". ", n.lines, " data sets found.")
+      plot.title <- paste0("Error By Wind Speed Bin for ",
+                           capFirst(data.range),
+                           " Data")
+      plot.subtitle <- paste0("Using ",
+                              correction,
+                              ". ",
+                              n.lines,
+                              " data sets found.")
       
-      p <- ggplot(data = sub,
-                  aes(x = x.label,
-                      y = error.val.pc,
-                      group = data.file,
-                      colour = data.file)) + 
-        geom_hline(yintercept = 0) +
-        geom_line() + 
-        #stat_summary(fun.y=sum, geom="line") +
-        scale_color_manual(values = lines.palette) +
-        guides(colour = FALSE) +
-        ggtitle(bquote(atop(.(plot.title), 
-                            atop(italic(.(plot.subtitle)), "")))) + 
-        scale_x_discrete(name = "Normalized Wind Speed (binned)") +
-        scale_y_continuous(name = "Normalized Mean Error (Predicted - Actual, %)")+
-        #coord_cartesian(ylim = c(-15, 15)) +
-        theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      if(all((sub$error.val.pc)==0)){
+        # generate dummy data
+        dummy <- data.frame(data.file = "No data",
+                            x.label = factor(x = levels(df$x.label),
+                                             levels = levels(df$x.label),
+                                             ordered = TRUE),
+                            error.val.pc = 0,
+                            range = factor(data.range,
+                                           levels = levels(df$range)),
+                            correction = factor(correction,
+                                                levels = levels(df$correction)))
+        
+        # no data to plot; need empty axes
+        # working on https://github.com/hadley/ggplot2/pull/1582; requires the development version of ggplot2
+        p <- ggplot(data = dummy,
+                    aes(x = x.label,
+                        y = error.val.pc)) + 
+          geom_hline(yintercept = 0) +
+          geom_blank() + 
+          scale_x_discrete(name = "Normalized Wind Speed (binned)",
+                           drop = FALSE) +
+          scale_y_continuous(name = "Normalized Mean Error (Predicted - Actual, %)",
+                             limits =c(-15,15)) +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+          labs(title = plot.title) +
+          labs(subtitle = plot.subtitle) + 
+          labs(caption=plot.caption)
+      } else {
+        p <- ggplot(data = sub,
+                    aes(x = x.label,
+                        y = error.val.pc,
+                        group = data.file,
+                        colour = data.file)) + 
+          geom_hline(yintercept = 0) +
+          geom_line() + 
+          scale_color_manual(values = lines.palette) +
+          guides(colour = FALSE) +
+          scale_x_discrete(name = "Normalized Wind Speed (binned)",
+                           drop = FALSE) +
+          scale_y_continuous(name = "Normalized Mean Error (Predicted - Actual, %)") +
+          theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+          labs(title = plot.title) +
+          labs(subtitle = plot.subtitle) + 
+          labs(caption=plot.caption)
+      }
       
       #+ fig.height = 4, fig.width = 6
       print(p)
-      makeFootnote(plot.label)
       
       if (sw.version == ""){
         filename = paste0("AllErrorsByWSBin_Lines_", 
@@ -103,19 +137,14 @@ PlotAllErrorsByWSBin_Lines <- function(df,
                           filename.suffix,
                           ".png")
       }
-      
-      png(filename = file.path(output.dir,
-                               filename),
-          width = 6, 
-          height = 4, 
-          units = "in", 
-          pointsize = 10, 
-          res = 300,
-          bg = "white")
-      print(p)
-      makeFootnote(plot.label,
-                   base.size = 6)
-      dev.off()
+      # save the figure
+      ggsave(filename = file.path(output.dir,
+                                  filename),
+             plot = p,
+             width = 6, 
+             height = 4, 
+             units = "in", 
+             dpi = 300)
     }
   } else {
     message("No data found with the requested software version")

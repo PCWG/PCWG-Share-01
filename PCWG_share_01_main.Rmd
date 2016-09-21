@@ -34,16 +34,16 @@ made.by = "A. Clifton, NREL"
 data.public = TRUE
 
 # Reanalyze existing data?
-data.analyze.raw = TRUE
+data.analyze.raw = FALSE
 
 # Do not load versions of the tool before...
 # will be ignored if "" is used
 # use data versions in the form "x.x.x". 
 # Note that this may conflict with some code
-data.version.earliest =""
+data.version.earliest ="0.6.0"
 ```
 
-Note that _data.version.earliest_ is used to limit the data that are processed; data before this version number will not be used. Also, a major change in data processing occurred in version 0.5.9 of the PCWG tool. Therefore, the functions used in the preparation of this document have two inputs (_sw.version_ and _sw.version.logic_) that can be used to select the data that are used for each plot.
+Note that _data.version.earliest_ is used to limit the data that are processed; data before this version number will not be used. In this document, _data.version.earliest_ was set to  `cat('"',data.version.earliest,'"')`. Also, a major change in data processing occurred in version 0.5.9 of the PCWG tool. Therefore, the functions used in the preparation of this document have two inputs (_sw.version_ and _sw.version.logic_) that can be used to select the data that are used for each plot.
 
 ```{r check old data actually exists, results="asis", echo = FALSE}
 # define the path to the directory that we will use to store all of the data
@@ -115,8 +115,7 @@ The folowing files should be placed in the _project.root_ directory:
 ```{r configure graphics, message=FALSE, echo = FALSE}
 # configure graphics appearance
 theme_set(theme_PCWG(base_size = 8, 
-                     base_family = "sans"))
-
+               base_family = "sans"))
 ```
 
 # Results from each data set
@@ -129,7 +128,11 @@ if (data.analyze.raw == TRUE){
   # identify the data sets that we have available
   data.files = dir(data.dir, 
                    recursive = TRUE,
-                   pattern = ".xls")
+                   pattern = "\\.xls$")
+  
+  # remove the file called summary.xls
+  data.files <- data.files[lapply(data.files,function(x) length(grep("ummary",x,value=FALSE))) == 0]
+  
   
   # create an empty list to store data in at a later date 
   all.data <- list(sub = NULL,
@@ -168,6 +171,7 @@ if (data.analyze.raw == TRUE){
       # keep going; read more of the file
       # read the meta data
       in.meta <- ReadMetaData(wb)
+      
       meta.data.file <- file.path(data.dir,
                                   dirname(data.file),
                                   "metaData.R")
@@ -278,16 +282,16 @@ Data suppliers were categorized according to the role they play in the wind indu
 * Original Equipment Manufacturers (OEMs): design, manufature, and maintain wind turbines 
 
 ```{r Histogram of data supplier types, echo=FALSE, fig.width = 6.5, fig.height = 3.5, fig.cap="Data Sources"}
-PlotAllDataSources(all.data$meta,
-                   sw.version = "0.5.8",
-                   sw.version.logic = "to",
-                   output.dir,
-                   made.by)
-PlotAllDataSources(all.data$meta,
-                   sw.version = "0.5.9",
-                   sw.version.logic = "from",
-                   output.dir,
-                   made.by)
+PlotAllDataSuppliers(all.data$meta,
+                     sw.version = "0.5.8",
+                     sw.version.logic = "to",
+                     output.dir,
+                     made.by)
+PlotAllDataSuppliers(all.data$meta,
+                     sw.version = "0.5.9",
+                     sw.version.logic = "from",
+                     output.dir,
+                     made.by)
 ``` 
 
 ## Turbine Sizes
@@ -313,11 +317,6 @@ The coutry in which the turbine was located was reported in `r NROW(na.omit(all.
 
 ```{r Histogram of turbine locations, echo=FALSE, fig.width = 6.5, fig.height = 3.5, fig.cap="Turbine locations by country"}
 PlotAllTurbineLocations(all.data$meta,
-                        sw.version = "0.5.8",
-                        sw.version.logic = "to",
-                        output.dir,
-                        made.by)
-PlotAllTurbineLocations(all.data$meta,
                         sw.version = "0.5.9",
                         sw.version.logic = "from",
                         output.dir,
@@ -328,8 +327,8 @@ Data were obtained from turbines in `r NROW(unique(na.omit(all.data$meta$Geograp
 
 ```{r Map of turbine locations, message = FALSE, echo=FALSE, fig.width = 6.5, fig.height = 3.5}
 MapAllTurbineLocations(all.data$meta,
-                       sw.version = "0.5.8",
-                       sw.version.logic = "equals",
+                       sw.version = "0.5.9",
+                       sw.version.logic = "from",
                        code.dir,
                        output.dir,
                        made.by =made.by)
@@ -349,12 +348,6 @@ Error may reasonably be expected to be a function of wind speed. In order to mai
 
 ### All Errors
 ```{r plot errors by wind speed bin using lines, echo=FALSE, fig.width = 6.5, fig.height = 4.5}
-PlotAllErrorsByWSBin_Lines(all.data$errors$by.WS,
-                           data.range = "all",
-                           sw.version = "0.5.8",
-                           sw.version.logic = "to",
-                           output.dir)
-
 PlotAllErrorsByWSBin_Lines(all.data$errors$by.WS,
                            data.range = "all",
                            sw.version = "0.5.9",
@@ -400,12 +393,6 @@ The following plots show the error in each wind speed bin, grouped by correction
 ```{r plot errors by wind speed bin using box-and-whiskers plot, echo=FALSE,  fig.width = 6.5, fig.height = 3.5}
 PlotAllErrorsByWSBin_BoxNWhiskers(all.data$errors$by.WS,
                                   data.range = "all",
-                                  sw.version = "0.5.8",
-                                  sw.version.logic = "to",
-                                  output.dir)
-
-PlotAllErrorsByWSBin_BoxNWhiskers(all.data$errors$by.WS,
-                                  data.range = "all",
                                   sw.version = "0.5.9",
                                   sw.version.logic = "from",
                                   output.dir)
@@ -441,11 +428,6 @@ Based on this definition, it would be expected that the error in the inner range
 
 ```{r baseline inner and outer range histogram, echo = FALSE, fig.width = 6.5, fig.height = 3.5}
 PlotAllBaselineErrorsByRange(all.data$errors$by.Range,
-                             sw.version = "0.5.8",
-                             sw.version.logic = "to",
-                             output.dir)
-
-PlotAllBaselineErrorsByRange(all.data$errors$by.Range,
                              sw.version = "0.5.9",
                              sw.version.logic = "from",
                              output.dir)
@@ -454,19 +436,14 @@ PlotAllBaselineErrorsByRange(all.data$errors$by.Range,
 
 ```{r statistics, echo = TRUE}
 StatsByRange(all.data$errors$by.Range,
-             sw.version = "0.5.8",
-             sw.version.logic = "to") 
+             sw.version = "0.5.9",
+             sw.version.logic = "from") 
 ```
 
 ## The Effect of The Turbulence Correction on the Outer Range Error
 The PCWG investigated the effect of turbulence on the power curve uncertainty. The effect of turbulence was to be accounted for using the turbulence correction approach. If this approach were succesful, we would expect to see reduced error with the turbulence correction, compared to the baseline. A comparison of the outer range error with and without turbulence correction is shown in the following figure.
 
 ```{r, echo = FALSE, fig.width = 6.5, fig.height = 3.5}
-PlotAllOuterErrorsTurbulenceCorrection(all.data$errors$by.Range,
-                                       sw.version = "0.5.8",
-                                       sw.version.logic = "to",
-                                       output.dir)
-
 PlotAllOuterErrorsTurbulenceCorrection(all.data$errors$by.Range,
                                        sw.version = "0.5.9",
                                        sw.version.logic = "from",
@@ -477,11 +454,6 @@ PlotAllOuterErrorsTurbulenceCorrection(all.data$errors$by.Range,
 A similar analysis as in the previous section can be applied to the improvement in both the inner and outer range. The following plot shows the difference in the error in each data set in the inner or outer range, compared to the baseline method. The 1:1 line is shown for comparison; a data point below the line has a lower normalized mean error with the correction, than it had with the baseline method. The number of data sets with each correction is also shown, together with the percentage of the data sets that showed an improvement using this correction.
 
 ```{r plot improvement, fig.width = 6.5, fig.height = 4.5, echo=FALSE}
-PlotImprovementByRangeAndCorrection(all.data$errors$by.Range,
-                                    sw.version = "0.5.8",
-                                    sw.version.logic = "to",
-                                    output.dir)
-
 PlotImprovementByRangeAndCorrection(all.data$errors$by.Range,
                                     sw.version = "0.5.9",
                                     sw.version.logic = "from",
@@ -495,12 +467,6 @@ The following plot shows how effective each set of corrections is, for each of f
 ```{r, echo=FALSE, fig.width = 6.5, fig.height = 4.5}
 # plot the change compared to the baseline in each data set
 PlotAllChangeInErrorsBy4CM(df.in = all.data$errors$by.4CM,
-                           sw.version = "0.5.8",
-                           sw.version.logic = "to",
-                           error.name = "NME",
-                           output.dir)
-
-PlotAllChangeInErrorsBy4CM(df.in = all.data$errors$by.4CM,
                            sw.version = "0.5.9",
                            sw.version.logic = "from",
                            error.name = "NMAE",
@@ -508,11 +474,6 @@ PlotAllChangeInErrorsBy4CM(df.in = all.data$errors$by.4CM,
 ```             
 
 ```{r}
-PlotImprovementBy4CM(all.data$errors$by.4CM,
-                     sw.version = "0.5.8",
-                     sw.version.logic = "to",
-                     output.dir)
-
 PlotImprovementBy4CM(all.data$errors$by.4CM,
                      sw.version = "0.5.9",
                      sw.version.logic = "from",

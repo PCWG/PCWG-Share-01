@@ -1,4 +1,4 @@
-Read4CMErrorData <- function(wb,sheet){
+Read4CMErrorData <- function(wb,sheet,sv){
   # reads a PCWG Share 01 file and returns data about the error
   #
   # Args:
@@ -9,12 +9,17 @@ Read4CMErrorData <- function(wb,sheet){
   
   require(XLConnect)
   setMissingValue(wb," ")
+  # figure out the starting row
+  if(compareVersion(VersionStr(sv),
+                    "0.5.8") <= 0){sr = 27}
+  if(compareVersion(VersionStr(sv),
+                    "0.5.8") > 0){sr = 35}
   
   # get data...
   # By Four Cell Matrix
   bin = paste(as.character(readWorksheet(wb,
                                          sheet = sheet,
-                                         region = "D27:G27",
+                                         region = paste0("D",sr,":G", sr),
                                          header = FALSE,
                                          autofitCol = FALSE,
                                          autofitRow= FALSE)),
@@ -22,7 +27,7 @@ Read4CMErrorData <- function(wb,sheet){
               sep=" ")
   data.count = paste(as.character(readWorksheet(wb,
                                                 sheet = sheet,
-                                                region = "D28:G28",
+                                                region = paste0("D",sr+1,":G", sr+1),
                                                 header = FALSE,
                                                 autofitCol = FALSE,
                                                 autofitRow= FALSE)),
@@ -30,7 +35,7 @@ Read4CMErrorData <- function(wb,sheet){
                      sep=" ")
   NME = paste(as.character(readWorksheet(wb,
                                          sheet = sheet,
-                                         region = "D29:G29",
+                                         region = paste0("D",sr+2,":G", sr+2),
                                          header = FALSE,
                                          autofitCol = FALSE,
                                          autofitRow= FALSE)),
@@ -38,7 +43,7 @@ Read4CMErrorData <- function(wb,sheet){
               sep=" ")
   NMAE = paste(as.character(readWorksheet(wb,
                                           sheet = sheet,
-                                          region = "D30:G30",
+                                          region = paste0("D",sr+3,":G", sr+3),
                                           header = FALSE,
                                           autofitCol = FALSE,
                                           autofitRow= FALSE)),

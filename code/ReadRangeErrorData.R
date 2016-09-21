@@ -1,4 +1,4 @@
-ReadRangeErrorData <- function(wb,sheet){
+ReadRangeErrorData <- function(wb,sheet,sv){
   # reads a PCWG Share 01 file and returns data about the error
   #
   # Args:
@@ -9,12 +9,17 @@ ReadRangeErrorData <- function(wb,sheet){
   
   require(XLConnect)
   setMissingValue(wb," ")
+  # figure out the starting row
+  if(compareVersion(VersionStr(sv),
+                    "0.5.8") <= 0){sr = 23}
+  if(compareVersion(VersionStr(sv),
+                    "0.5.8") > 0){sr = 31}
   
   # get data...
   # By range
   bin = paste(as.character(readWorksheet(wb,
                                          sheet = sheet,
-                                         region = "D23:E23",
+                                         region = paste0("D",sr,":E", sr),
                                          header = FALSE,
                                          autofitCol = FALSE,
                                          autofitRow= FALSE)),
@@ -22,7 +27,7 @@ ReadRangeErrorData <- function(wb,sheet){
               sep=" ")
   data.count = paste(as.character(readWorksheet(wb,
                                                 sheet = sheet,
-                                                region = "D24:E24",
+                                                region = paste0("D",sr+1,":E", sr+1),
                                                 header = FALSE,
                                                 autofitCol = FALSE,
                                                 autofitRow= FALSE)),
@@ -30,7 +35,7 @@ ReadRangeErrorData <- function(wb,sheet){
                      sep=" ")
   NME = paste(as.character(readWorksheet(wb,
                                          sheet = sheet,
-                                         region = "D25:E25",
+                                         region = paste0("D",sr+2,":E", sr+2),
                                          header = FALSE,
                                          autofitCol = FALSE,
                                          autofitRow= FALSE)),
@@ -38,7 +43,7 @@ ReadRangeErrorData <- function(wb,sheet){
               sep=" ")
   NMAE = paste(as.character(readWorksheet(wb,
                                           sheet = sheet,
-                                          region = "D26:E26",
+                                          region = paste0("D",sr+3,":E", sr+3),
                                           header = FALSE,
                                           autofitCol = FALSE,
                                           autofitRow= FALSE)),

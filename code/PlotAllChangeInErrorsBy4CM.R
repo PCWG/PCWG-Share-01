@@ -54,11 +54,12 @@ PlotAllChangeInErrorsBy4CM <- function(df.in,
   
   # continue if we have data
   if (NROW(df)>0){
-    # create the plot label
-    plot.label <- labelAggregate(as.character(NROW(unique(df$data.file))),
-                                 df$sw.version,
-                                 made.by)
-    
+    # create the plot labels
+    n.lines <- NROW(unique(df$data.file))
+    plot.subtitle <- paste0(n.lines, " data sets found.")
+    plot.caption <- labelAggregate(as.character(NROW(unique(df$data.file))),
+                                   df$sw.version,
+                                   made.by)
     #filter by error type
     if (error.name == ""){
       
@@ -69,7 +70,7 @@ PlotAllChangeInErrorsBy4CM <- function(df.in,
     }
     
     # plot the data by bin
-    p1 <- ggplot(data = df,
+    p <- ggplot(data = df,
                  aes(x = correction,
                      y = error.delta.pc)) + 
       geom_hline(yintercept=0) +
@@ -78,32 +79,34 @@ PlotAllChangeInErrorsBy4CM <- function(df.in,
                  as.table = FALSE) +
       labs(x = "Corrections Applied",
            y = "|Normalized Error with Corrections|\n - |Baseline Normalized Error| (%)") +
-      theme(axis.text.x = element_text(angle = 45, hjust = 1))
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+      labs(subtitle = plot.subtitle) + 
+      labs(caption = plot.caption)
     
     # change plot by error type
     if (error.name == ""){
-      p1 <- p1 + 
+      p <- p + 
         aes(color = error.name) +
-        ggtitle("Change in Magnitude of Errors") +
+        labs(title = "Change in Magnitude of Errors") +
         scale_color_brewer(type="qual",
                            palette = 7,
                            name = "Error type")
       base.filename <- "ChangeInErrorBy4CM"
     } else if (error.name == "NME"){
-      p1 <- p1 + 
-        ggtitle("Change in Magnitude of Normalized Mean Error (NME)")
+      p <- p + 
+        labs(title = "Change in Magnitude of Normalized Mean Error (NME)")
       
       base.filename <- "ChangeInNMEBy4CM"
     } else if (error.name == "NMAE"){
-      p1 <- p1 + 
-        ggtitle("Change in Magnitude of Normalized Mean Absolute Error (NMAE)")
+      p <- p + 
+        labs(title = "Change in Magnitude of Normalized Mean Absolute Error (NMAE)")
       
       base.filename <- "ChangeInNMAEBy4CM"
     }
     
     
-    print(p1)
-    makeFootnote(plot.label)
+    print(p)
+    
     if (sw.version == ""){
       filename = paste0(base.filename,
                         "allSWversions.png")
@@ -115,18 +118,15 @@ PlotAllChangeInErrorsBy4CM <- function(df.in,
                         ".png")
     }
     
-    png(filename = file.path(output.dir,
-                             filename),
-        width = 6, 
-        height = 5, 
-        units = "in", 
-        pointsize = 10, 
-        res = 300,
-        bg = "white")
-    print(p1)
-    makeFootnote(plot.label,
-                 base.size = 6)
-    dev.off()
+    # save the figure
+    ggsave(filename = file.path(output.dir,
+                                filename),
+           plot = p,
+           width = 6, 
+           height = 5, 
+           units = "in", 
+           dpi = 300)
+    
   } else {
     message("No data found with the requested software version")
   }

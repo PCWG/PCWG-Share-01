@@ -20,36 +20,9 @@ ReadErrorData <- function(wb,
                    data.frame(ExpandErrorByWSDF(ReadWSErrorData(wb,sheet),
                                                 sheets),
                               range = "all"))
-    if (compareVersion(VersionStr(in.sub$sw.version),
-                       "0.5.8") <= 0){
-      
-      # by time of day
-      by.TOD <- rbind(by.TOD,
-                      ExpandErrorByTODDF(ReadTODErrorData(wb,sheet),
-                                         sheets))
-      
-      # by calendar month
-      by.CM <- rbind(by.CM,
-                     ExpandErrorByCMDF(ReadCMErrorData(wb,sheet),
-                                       sheets))
-      
-      # by wind direction
-      by.WD <- rbind(by.WD,
-                     ExpandErrorByWDDF(ReadWDErrorData(wb,sheet),
-                                       sheets))
-      
-      # by range
-      by.Range <- rbind(by.Range,
-                        ExpandErrorByRangeDF(ReadRangeErrorData(wb,sheet),
-                                             sheets))
-      
-      # from four-cell matrix
-      by.4CM <- rbind(by.4CM,
-                      ExpandErrorBy4CMDF(Read4CMErrorData(wb,sheet),
-                                         sheets))
-    } else {
-      
-      # Add error binned by WS in the inner and outer range 
+    # Add error binned by WS in the inner and outer range (only for version > 0.5.8)
+    if (compareVersion(VersionStr(sw.version),
+                       "0.5.8") > 0){
       by.WS <- rbind(by.WS,
                      data.frame(ExpandErrorByWSDF(ReadWSInnerRangeErrorData(wb,sheet),
                                                   sheets),
@@ -57,39 +30,28 @@ ReadErrorData <- function(wb,
                      data.frame(ExpandErrorByWSDF(ReadWSOuterRangeErrorData(wb,sheet),
                                                   sheets),
                                 range = "Outer"))
-      
-      # by time of day
-      by.TOD <- rbind(by.TOD,
-                      ExpandErrorByTODDF(ReadTODErrorData2(wb,sheet),
-                                         sheets))
-      
-      # by calendar month
-      by.CM <- rbind(by.CM,
-                     ExpandErrorByCMDF(ReadCMErrorData2(wb,sheet),
-                                       sheets))
-      
-      # by wind direction
-      by.WD <- rbind(by.WD,
-                     ExpandErrorByWDDF(ReadWDErrorData2(wb,sheet),
-                                       sheets))
-      
-      # by range
-      by.Range <- rbind(by.Range,
-                        ExpandErrorByRangeDF(ReadRangeErrorData2(wb,sheet),
-                                             sheets))
-      
-      # from four-cell matrix
-      by.4CM <- rbind(by.4CM,
-                      ExpandErrorBy4CMDF(Read4CMErrorData2(wb,sheet),
-                                         sheets))
-      
-      
-      
     }
-    
+    # by time of day
+    by.TOD <- rbind(by.TOD,
+                    ExpandErrorByTODDF(ReadTODErrorData(wb,sheet,sw.version),
+                                       sheets))
+    # by calendar month
+    by.CM <- rbind(by.CM,
+                   ExpandErrorByCMDF(ReadCMErrorData(wb,sheet,sw.version),
+                                     sheets))
+    # by wind direction
+    by.WD <- rbind(by.WD,
+                   ExpandErrorByWDDF(ReadWDErrorData(wb,sheet,sw.version),
+                                     sheets))
+    # by range
+    by.Range <- rbind(by.Range,
+                      ExpandErrorByRangeDF(ReadRangeErrorData(wb,sheet,sw.version),
+                                           sheets))
+    # from four-cell matrix
+    by.4CM <- rbind(by.4CM,
+                    ExpandErrorBy4CMDF(Read4CMErrorData(wb,sheet,sw.version),
+                                       sheets))
   }
-  
-  
   
   # pack up the errors
   errors <- list(by.WS = data.frame(by.WS,

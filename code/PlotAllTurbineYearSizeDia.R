@@ -28,10 +28,19 @@ PlotAllTurbineYearSizeDia <- function(df,
   }
   
   # continue if we have data
-  if (NROW(df)>0){
+  if ((NROW(df)>0) & 
+      (any(nchar(df$turbine.height)>0,na.rm = TRUE)) &
+      (any(nchar(df$year.of.measurement)>0,na.rm = TRUE))){
     
-    # create the plot label
-    plot.label <- labelAggregate(as.character(NROW(unique(df$data.file))),
+    # get the number of datasets
+    n.lines <- NROW(unique(df$data.file))
+    # create the plot title
+    plot.title <- "Turbines in the Data Sets"
+    # create the plot subtitle
+    plot.subtitle <- paste0(n.lines,
+                            " data sets found.")
+    # create the plot caption
+    plot.caption <- labelAggregate(as.character(NROW(unique(df$data.file))),
                                  df$sw.version,
                                  made.by)
     
@@ -53,9 +62,11 @@ PlotAllTurbineYearSizeDia <- function(df,
                             range = c(min(df$turbine.dia,na.rm=TRUE)/10, 
                                       max(df$turbine.dia,na.rm=TRUE)/10),
                             name = "Diameter (m)") +
-      ggtitle("Turbines in the Data Sets") +
       labs(x = "Year of Measurement",
-           y = "Turbine Hub Height (m)")
+           y = "Turbine Hub Height (m)") +
+      labs(title = plot.title) +
+      labs(subtitle = plot.subtitle) +
+      labs(caption=plot.caption) 
     
     if (sw.version.logic == "equals"){
       p <- p + scale_fill_discrete(guide=FALSE)
@@ -65,7 +76,6 @@ PlotAllTurbineYearSizeDia <- function(df,
     
     #+ fig.height = 4, fig.width = 6
     print(p)
-    makeFootnote(plot.label)
     
     if (sw.version == ""){
       filename = paste0("TurbineYearSizeDia_allSWversions.png")
@@ -76,20 +86,16 @@ PlotAllTurbineYearSizeDia <- function(df,
                         ".png")
     }
     
-    png(filename = file.path(output.dir,
-                             filename),
-        width = 6, 
-        height = 4, 
-        units = "in", 
-        pointsize = 10, 
-        res = 300,
-        bg = "white")
-    print(p)
-    makeFootnote(plot.label,
-                 base.size = 6)
-    dev.off()  
+    ggsave(filename = file.path(output.dir,
+                                filename),
+           plot = p,
+           width = 6, 
+           height = 4, 
+           units = "in", 
+           dpi = 300)
+    
   } else {
-    message("No data found with the requested software version")
+    message("No suitable data found with the requested software version")
   }
   
   # turn warnings back on

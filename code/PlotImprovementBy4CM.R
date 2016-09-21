@@ -28,10 +28,13 @@ PlotImprovementBy4CM <- function(df,
   
   # continue if we have data
   if (NROW(df)>0){
-    # create the plot label
-    plot.label <- labelAggregate(as.character(NROW(unique(df$data.file))),
-                                 df$sw.version,
-                                 made.by)
+    # create the plot labels
+    plot.title <- "Improvement Compared to Baseline"
+    n.lines <- NROW(unique(df$data.file))
+    plot.subtitle <- paste0(n.lines, " data sets found.")
+    plot.caption <- labelAggregate(as.character(NROW(unique(df$data.file))),
+                                   df$sw.version,
+                                   made.by)
     
     # create a "cell" value that we can look for
     df$cell <- paste0(df$WS.cell,
@@ -95,14 +98,13 @@ PlotImprovementBy4CM <- function(df,
       scale_y_continuous(name = "Normalized Mean Error with Corrections (%)") +
       scale_x_continuous(name = "Baseline Normalized Mean Error (%)") +
       coord_cartesian(xlim = c(-max.error, max.error),
-                      ylim = c(-max.error,max.error)) 
-    theme(legend.position="bottom",
-          aspect.ratio = 1)
+                      ylim = c(-max.error,max.error)) +
+      labs(title = plot.title) +
+      labs(subtitle = plot.subtitle) + 
+      labs(caption = plot.caption)
     
     #+ fig.height = 6, fig.width = 6
     print(p)
-    makeFootnote(plot.label,
-                 base.size = 6)
     
     if (sw.version == ""){
       filename = paste0("ImprovementBy4CM_allSWversions.png")
@@ -113,18 +115,15 @@ PlotImprovementBy4CM <- function(df,
                         ".png")
     }
     
-    png(filename = file.path(output.dir,
-                             filename),
-        width = 6, 
-        height = 6, 
-        units = "in", 
-        pointsize = 10, 
-        res = 300,
-        bg = "white")
-    print(p)
-    makeFootnote(plot.label,
-                 base.size = 6)
-    dev.off()  
+    # save the figure
+    ggsave(filename = file.path(output.dir,
+                                filename),
+           plot = p,
+           width = 6, 
+           height = 6, 
+           units = "in", 
+           dpi = 300)
+     
   } else {
     message("No data found with the requested software version")
   }

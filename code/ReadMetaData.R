@@ -8,17 +8,18 @@ ReadMetaData <- function(wb){
   # data.frame containing data from the "Meta Data" tab
   
   require(XLConnect)
-  # initalize the data fram
+  # initalize the data frame
   data.meta = data.frame(data.type = NullToNA(readWorksheet(wb,
                                                             sheet = "Meta Data",
                                                             region = "C8",
                                                             simplify = TRUE,
-                                                            header = FALSE)),
+                                                            header = FALSE),
+                                              xAlt = "Not Reported"),
                          REWS.n.heights = NullToNA(readWorksheet(wb,
                                                                  sheet = "Meta Data",
                                                                  region = "C9",
-                                                                 header = FALSE,
                                                                  simplify = TRUE,
+                                                                 header = FALSE,
                                                                  colTypes = c(XLC$DATA_TYPE.NUMERIC))),
                          REWS.inc.veer = NullToNA(readWorksheet(wb,
                                                                 sheet = "Meta Data",
