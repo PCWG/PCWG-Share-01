@@ -36,6 +36,14 @@ data.public = TRUE
 # Reanalyze existing data?
 data.analyze.raw = TRUE
 
+# software version to use:
+# version string in "x.x.x" format
+sw.version = "0.6.0"
+# should we use versions less, equal, or greater than that?
+sw.version.logic = "from" 
+# options are "to" (<=), "equals" (==), or "from" (>=).
+# See SelectDatabySWVersion.R for implications.
+
 # Do not load versions of the tool before...
 # will be ignored if "" is used
 # use data versions in the form "x.x.x". 
@@ -133,7 +141,6 @@ if (data.analyze.raw == TRUE){
   # remove the file called summary.xls
   data.files <- data.files[lapply(data.files,function(x) length(grep("ummary",x,value=FALSE))) == 0]
   
-  
   # create an empty list to store data in at a later date 
   all.data <- list(sub = NULL,
                    meta = NULL,
@@ -158,14 +165,14 @@ if (data.analyze.raw == TRUE){
     
     # depending on how up to date the version is, continue or stop
     if (do.continue < 0){
-      print(paste0("Checking software versions. ", data.file ,
+      cat(text = paste0("\nChecking software versions. ", data.file ,
                    " was produced using ", in.sub$sw.version,
-                   ": skipping file."))
+                   ": skipping file.\n"))
       rm(list = c("wb","in.sub"))
     } else {
-      print(paste0("Checking software versions. ", data.file ,
+      cat(text = paste0("\nChecking software versions. ", data.file ,
                    " was produced using ", in.sub$sw.version,
-                   ": using file."))
+                   ": using file.\n"))
       count.version = count.version+1
       
       # keep going; read more of the file
@@ -276,20 +283,19 @@ if (data.analyze.raw == TRUE){
 # Data Sets
 ## Data Suppliers
 Data suppliers were categorized according to the role they play in the wind industry. Roles include:
+
 * Consultants: providing technical services to others but with no financial interest in the development or operation of the wind plant
+
 * Developers: site, design, and plan (or carry out) construction of prospective wind plants.
+
 * Owner/operators: have a finacial stake in the wind plant and are involved with some or all of the day-to-day running of the wind plant
+
 * Original Equipment Manufacturers (OEMs): design, manufature, and maintain wind turbines 
 
 ```{r Histogram of data supplier types, echo=FALSE, fig.width = 6.5, fig.height = 3.5, fig.cap="Data Sources"}
 PlotAllDataSuppliers(all.data$meta,
-                     sw.version = "0.5.8",
-                     sw.version.logic = "to",
-                     output.dir,
-                     made.by)
-PlotAllDataSuppliers(all.data$meta,
-                     sw.version = "0.5.9",
-                     sw.version.logic = "from",
+                     sw.version = sw.version,
+                     sw.version.logic = sw.version.logic,
                      output.dir,
                      made.by)
 ``` 
@@ -299,14 +305,8 @@ In total, `r nrow(all.data$sub)` data sets were submitted. The `r nrow(all.data$
 
 ```{r plot turbine year and size, fig.width = 6.5, fig.height = 3.5, echo=FALSE}
 PlotAllTurbineYearSizeDia(all.data$meta,
-                          sw.version = "0.5.8",
-                          sw.version.logic = "to",
-                          output.dir,
-                          made.by)
-
-PlotAllTurbineYearSizeDia(all.data$meta,
-                          sw.version = "0.5.9",
-                          sw.version.logic = "from",
+                          sw.version = sw.version,
+                          sw.version.logic = sw.version.logic,
                           output.dir,
                           made.by)
 
@@ -317,8 +317,8 @@ The coutry in which the turbine was located was reported in `r NROW(na.omit(all.
 
 ```{r Histogram of turbine locations, echo=FALSE, fig.width = 6.5, fig.height = 3.5, fig.cap="Turbine locations by country"}
 PlotAllTurbineLocations(all.data$meta,
-                        sw.version = "0.5.9",
-                        sw.version.logic = "from",
+                        sw.version = sw.version,
+                        sw.version.logic = sw.version.logic,
                         output.dir,
                         made.by)
 ``` 
@@ -327,8 +327,8 @@ Data were obtained from turbines in `r NROW(unique(na.omit(all.data$meta$Geograp
 
 ```{r Map of turbine locations, message = FALSE, echo=FALSE, fig.width = 6.5, fig.height = 3.5}
 MapAllTurbineLocations(all.data$meta,
-                       sw.version = "0.5.9",
-                       sw.version.logic = "from",
+                       sw.version = sw.version,
+                       sw.version.logic = sw.version.logic,
                        code.dir,
                        output.dir,
                        made.by =made.by)
@@ -350,13 +350,13 @@ Error may reasonably be expected to be a function of wind speed. In order to mai
 ```{r plot errors by wind speed bin using lines, echo=FALSE, fig.width = 6.5, fig.height = 4.5}
 PlotAllErrorsByWSBin_Lines(all.data$errors$by.WS,
                            data.range = "all",
-                           sw.version = "0.5.9",
-                           sw.version.logic = "from",
+                           sw.version = sw.version,
+                           sw.version.logic = sw.version.logic,
                            output.dir)
 ```               
 
 ### Errors grouped by magnitude of Error
-The following figures show the error by wind speed for data sets with basleine inner range absolute NME greater than 2%.
+The following figures show the error by wind speed for data sets with baseline inner range absolute NME greater than 2%.
 ```{r Error by wind speed for high-NME data sets, echo=FALSE, fig.width = 6.5, fig.height = 4.5}
 # get the name of files with high baseline inner range NME
 data.files.NMEanom <- unique(as.character(all.data$errors$by.Range$data.file[(all.data$errors$by.Range$range == "Inner") & (abs(all.data$errors$by.Range$error.val.pc) > 2) & (all.data$errors$by.Range$correction == "Baseline") & (all.data$errors$by.Range$error.name == "NME")]))
@@ -364,8 +364,8 @@ data.files.NMEanom <- unique(as.character(all.data$errors$by.Range$data.file[(al
 # plot the eror by wind speed for those files
 PlotAllErrorsByWSBin_Lines(all.data$errors$by.WS[all.data$errors$by.WS$data.file %in% data.files.NMEanom,],
                            data.range = "all",
-                           sw.version = "0.5.9",
-                           sw.version.logic = "from",
+                           sw.version = sw.version,
+                           sw.version.logic = sw.version.logic,
                            output.dir,
                            filename.suffix = "_absGT2pc")
 ```
@@ -379,8 +379,8 @@ data.files.NMEusual <- unique(as.character(all.data$errors$by.Range$data.file[(a
 # plot the eror by wind speed for those files
 PlotAllErrorsByWSBin_Lines(all.data$errors$by.WS[all.data$errors$by.WS$data.file %in% data.files.NMEusual,],
                            data.range = "all",
-                           sw.version = "0.5.9",
-                           sw.version.logic = "from",
+                           sw.version = sw.version,
+                           sw.version.logic = sw.version.logic,
                            output.dir,
                            filename.suffix = "_absLTEq2pc")
 ```
@@ -393,8 +393,8 @@ The following plots show the error in each wind speed bin, grouped by correction
 ```{r plot errors by wind speed bin using box-and-whiskers plot, echo=FALSE,  fig.width = 6.5, fig.height = 3.5}
 PlotAllErrorsByWSBin_BoxNWhiskers(all.data$errors$by.WS,
                                   data.range = "all",
-                                  sw.version = "0.5.9",
-                                  sw.version.logic = "from",
+                                  sw.version = sw.version,
+                                  sw.version.logic = sw.version.logic,
                                   output.dir)
 ```               
 
@@ -402,8 +402,8 @@ PlotAllErrorsByWSBin_BoxNWhiskers(all.data$errors$by.WS,
 ```{r plot all inner range errors by wind speed using box and whiskers, echo=FALSE,  fig.width = 6.5, fig.height = 3.5}
 PlotAllErrorsByWSBin_BoxNWhiskers(all.data$errors$by.WS,
                                   data.range = "Inner",
-                                  sw.version = "0.5.9",
-                                  sw.version.logic = "from",
+                                  sw.version = sw.version,
+                                  sw.version.logic = sw.version.logic,
                                   output.dir)
 ```               
 
@@ -411,8 +411,8 @@ PlotAllErrorsByWSBin_BoxNWhiskers(all.data$errors$by.WS,
 ```{r plot all outer range errors by wind speed using box and whiskers, echo=FALSE,  fig.width = 6.5, fig.height = 3.5}
 PlotAllErrorsByWSBin_BoxNWhiskers(all.data$errors$by.WS,
                                   data.range = "Outer",
-                                  sw.version = "0.5.9",
-                                  sw.version.logic = "from",
+                                  sw.version = sw.version,
+                                  sw.version.logic = sw.version.logic,
                                   output.dir)
 ```               
 
@@ -428,16 +428,16 @@ Based on this definition, it would be expected that the error in the inner range
 
 ```{r baseline inner and outer range histogram, echo = FALSE, fig.width = 6.5, fig.height = 3.5}
 PlotAllBaselineErrorsByRange(all.data$errors$by.Range,
-                             sw.version = "0.5.9",
-                             sw.version.logic = "from",
+                             sw.version = sw.version,
+                             sw.version.logic = sw.version.logic,
                              output.dir)
 
 ```
 
 ```{r statistics, echo = TRUE}
 StatsByRange(all.data$errors$by.Range,
-             sw.version = "0.5.9",
-             sw.version.logic = "from") 
+             sw.version = sw.version,
+             sw.version.logic = sw.version.logic) 
 ```
 
 ## The Effect of The Turbulence Correction on the Outer Range Error
@@ -445,8 +445,8 @@ The PCWG investigated the effect of turbulence on the power curve uncertainty. T
 
 ```{r, echo = FALSE, fig.width = 6.5, fig.height = 3.5}
 PlotAllOuterErrorsTurbulenceCorrection(all.data$errors$by.Range,
-                                       sw.version = "0.5.9",
-                                       sw.version.logic = "from",
+                                       sw.version = sw.version,
+                                       sw.version.logic = sw.version.logic,
                                        output.dir)
 ```
 
@@ -455,8 +455,8 @@ A similar analysis as in the previous section can be applied to the improvement 
 
 ```{r plot improvement, fig.width = 6.5, fig.height = 4.5, echo=FALSE}
 PlotImprovementByRangeAndCorrection(all.data$errors$by.Range,
-                                    sw.version = "0.5.9",
-                                    sw.version.logic = "from",
+                                    sw.version = sw.version,
+                                    sw.version.logic = sw.version.logic,
                                     output.dir)
 
 ```
@@ -467,7 +467,7 @@ The following plot shows how effective each set of corrections is, for each of f
 ```{r, echo=FALSE, fig.width = 6.5, fig.height = 4.5}
 # plot the change compared to the baseline in each data set
 PlotAllChangeInErrorsBy4CM(df.in = all.data$errors$by.4CM,
-                           sw.version = "0.5.9",
+                           sw.version = sw.version,
                            sw.version.logic = "from",
                            error.name = "NMAE",
                            output.dir)
@@ -475,7 +475,7 @@ PlotAllChangeInErrorsBy4CM(df.in = all.data$errors$by.4CM,
 
 ```{r}
 PlotImprovementBy4CM(all.data$errors$by.4CM,
-                     sw.version = "0.5.9",
+                     sw.version = sw.version,
                      sw.version.logic = "from",
                      output.dir)
 ```
