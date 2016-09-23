@@ -78,6 +78,7 @@ if (data.analyze.raw == FALSE){
 ```
 
 ## Packages
+### Standard Packages
 This script requires the _ggplot2_, _grid_, _knitr_, _RColorBrewer_, _rgdal_, _stringr_, and _XLConnect_ packages to run. These are called from the script but you may need to install them directly. For details of how to install packages, see the RStudio help. 
 
 ```{r load packages, message=FALSE, echo = FALSE}
@@ -88,6 +89,14 @@ require(knitr)
 require(reshape2)
 require(stringr)
 ```
+
+### WARNING
+Note that currently (September 21, 20216) the plots require the developer version of _ggplot2_. The github master of ggplot2 can be found at <https://github.com/hadley/ggplot2> . Installing this version requires the _devtools_ package. To install _devtools_ and the developer version of _ggplot2_, type:
+
+````{r install_dev_ggplot2, eval=FALSE, echo=TRUE}
+install.packages("devtools")
+devtools::install_github("hadley/ggplot2")
+````
 
 ## Directory structure
 
@@ -117,7 +126,7 @@ The folowing files should be placed in the _project.root_ directory:
 * /__analysis__ directory containg results of the analysis
 * /__code__ directory containing functions required for the analysis
 * /__data__ directory containing all data files to be analyzed. This can include further sub directories. 
-+ All .xls files contained in __data__ and sub directories will be used in the analysis.
++ All .xls files contained in __data__ and sub directories will be used in the analysis. Any __Summary.R__ files will be ignored.
 + A __metaData.R__ file can be added to __data__ and include the line _data.supplier.type <- <<supplier type>>_, where <<<<supplier type>> could be one of "Consultant", "Developer", "Owner/Operator", or "OEM". 
 
 ```{r configure graphics, message=FALSE, echo = FALSE}
@@ -474,7 +483,8 @@ PlotAllChangeInErrorsBy4CM(df.in = all.data$errors$by.4CM,
                            output.dir)
 ```             
 
-It is also possible to define a perfect correction which reduces all error to zero.
+It is also possible to define a perfect correction which reduces all error to zero. This is shown in the following plot as a benchmark correction.
+
 ```{r, echo=FALSE, fig.width = 6.5, fig.height = 4.5}
 # plot the change compared to the baseline in each data set
 PlotAllChangeInErrorsBy4CM(df.in = all.data$errors$by.4CM,
@@ -485,8 +495,7 @@ PlotAllChangeInErrorsBy4CM(df.in = all.data$errors$by.4CM,
                            output.dir)
 ```             
 
-
-```{r}
+```{r, echo=FALSE, fig.width = 6.5, fig.height = 4.5}
 PlotImprovementBy4CM(all.data$errors$by.4CM,
                      sw.version = sw.version,
                      sw.version.logic = "from",
