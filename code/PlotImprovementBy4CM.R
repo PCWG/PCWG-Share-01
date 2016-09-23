@@ -44,8 +44,11 @@ PlotImprovementBy4CM <- function(df,
     # get the reference data
     df.ref <- df[(df$error.name == "NME") & (df$correction == "Baseline"),
                  c("data.file","cell","error.val.pc")]
+    
+    # change the name of the baseline error
     colnames(df.ref)[colnames(df.ref) == 'error.val.pc'] <- 'baseline.error.val.pc'
     
+    # get the other corrections
     df.other <- df[(df$error.name == "NME")&(df$correction != "Baseline"),
                    c("data.file","cell","correction","error.val.pc")]
     
@@ -123,7 +126,7 @@ PlotImprovementBy4CM <- function(df,
            height = 6, 
            units = "in", 
            dpi = 300)
-     
+    
   } else {
     message("No data found with the requested software version")
   }

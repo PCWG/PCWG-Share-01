@@ -1,4 +1,5 @@
 PlotAllChangeInErrorsBy4CM <- function(df.in,
+                                       show.perfect = FALSE,
                                        sw.version = "",
                                        sw.version.logic = "equals",
                                        error.name = "",
@@ -16,6 +17,16 @@ PlotAllChangeInErrorsBy4CM <- function(df.in,
   # supress warnings
   oldw <- getOption("warn")
   options(warn = -1)
+  
+  # create a perfect data set, where the error is zero
+  if (show.perfect == TRUE){
+    df.perfect <- df.in[(df.in$correction == "Baseline"),]
+    df.perfect$correction <- factor("Perfect",
+                                    levels = c(levels(df.in$correction),"Perfect"),
+                                    ordered = TRUE)
+    df.perfect$error.val.pc[!is.na(df.perfect$error.val.pc)] <- 0.0
+    df.in <- rbind(df.in,df.perfect)
+  }
   
   # work out the change compared to the baseline
   df <- NULL
@@ -109,14 +120,20 @@ PlotAllChangeInErrorsBy4CM <- function(df.in,
     
     if (sw.version == ""){
       filename = paste0(base.filename,
-                        "allSWversions.png")
+                        "allSWversions")
     } else {
       filename = paste0(base.filename,
                         "_SWVersion",
                         sw.version.logic,
-                        sw.version,
-                        ".png")
+                        sw.version)
     }
+    
+    if (show.perfect == TRUE){
+      filename = paste0(filename, "_Perfect.png")
+    } else {
+      filename = paste0(filename, ".png")
+    }
+    
     
     # save the figure
     ggsave(filename = file.path(output.dir,

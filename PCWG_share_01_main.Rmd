@@ -34,7 +34,7 @@ made.by = "A. Clifton, NREL"
 data.public = TRUE
 
 # Reanalyze existing data?
-data.analyze.raw = TRUE
+data.analyze.raw = FALSE
 
 # software version to use:
 # version string in "x.x.x" format
@@ -467,11 +467,24 @@ The following plot shows how effective each set of corrections is, for each of f
 ```{r, echo=FALSE, fig.width = 6.5, fig.height = 4.5}
 # plot the change compared to the baseline in each data set
 PlotAllChangeInErrorsBy4CM(df.in = all.data$errors$by.4CM,
+                           show.perfect = FALSE,
                            sw.version = sw.version,
                            sw.version.logic = "from",
                            error.name = "NMAE",
                            output.dir)
 ```             
+
+It is also possible to define a perfect correction which reduces all error to zero.
+```{r, echo=FALSE, fig.width = 6.5, fig.height = 4.5}
+# plot the change compared to the baseline in each data set
+PlotAllChangeInErrorsBy4CM(df.in = all.data$errors$by.4CM,
+                           show.perfect = TRUE,
+                           sw.version = sw.version,
+                           sw.version.logic = "from",
+                           error.name = "NMAE",
+                           output.dir)
+```             
+
 
 ```{r}
 PlotImprovementBy4CM(all.data$errors$by.4CM,
