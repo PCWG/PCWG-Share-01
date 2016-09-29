@@ -6,8 +6,8 @@ This is the repository for an R package that provides code to aggregate response
 2. A GUI for R. R-studio is strongly recommended. See http://rstudio.com.
 3. Two or more data files from the Power Curve Working Group Tool, prepared for PCWG_Share_01
 
-#Download
-Click on the "Download ZIP" button on the lower right of this page. 
+#Releases
+You can find the most recent _stable_ version of this code in /releases. These different versions are designed to work with different versions of the PCWG Share Tool. You can download the source there.
 
 # How To Use This Code
 1. Create a directory somewhere and place the contents of the zip file into that directory (let's call this `$root`). *It is recommended that there be nothing else in the directory*.
@@ -28,17 +28,16 @@ Documentation is provided in several forms:
 * within `PCWG_share_01_main.html`, which will also contain the results when run using `knitr`.
 
 #Reporting issues and errors
-Please use the issue-tracker at https://github.com/AndyClifton/PCWG-Share-01/issues to report issues.
+Please use the issue-tracker at /issues to report issues.
 
 #Wiki
-Please use the wiki at https://github.com/AndyClifton/PCWG-Share-01/wiki as you feel fit.
+Please use the wiki at /wiki as you feel fit.
 
 #Comments
 This software is provided as is, with no guarantees.
 
 #Recent changes
-12.08.2015 Added logic to pick up data from specific versions. Plots modified to split out different corrections  / regions from each other.
-11.30.2015 First commit.
+See /releases.
 
 #Code Maintainers
 * [Andy Clifton](mailto:andrew.clifton@nrel.gov) (National Renewable Energy Laboratory)
