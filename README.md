@@ -1,12 +1,13 @@
-#Introduction
+# Introduction
 This is the repository for an R package that provides code to aggregate responses to the Power Curve Working Group "PCWG_Share_01" exercise. More details of the exercise can be found at http://www.pcwg.org and http://www.pcwg.org/PCWG-Share-01/PCWG-Share-01-Definition-Document.pdf.
 
-#Requirements
-1. A working installation of R. This can be obtained from e.g. http://r-project.org.
-2. A GUI for R. R-studio is strongly recommended. See http://rstudio.com.
+# Requirements
+1. A working installation of R with up-to-date packages. This can be obtained from e.g. http://r-project.org.
+   1. `ggplot2` version 2.2 or higher [is required to generate titles, captions, and other annotations on figures](http://ggplot2.tidyverse.org/reference/labs.html).
+2. A GUI for R. [R-studio is a popular option](http://rstudio.com).
 3. Two or more data files from the Power Curve Working Group Tool, prepared for PCWG_Share_01
 
-#Releases
+# Releases
 You can find the most recent _stable_ version of this code in the [releases](../../releases) part of this repository. These different versions are designed to work with different versions of the PCWG Share Tool. You can download the source there.
 
 # How To Use This Code
@@ -21,26 +22,26 @@ You can find the most recent _stable_ version of this code in the [releases](../
   2. hit `knit HTML` to generate the html results file; this will create an HTML file but will not generate any data in memory
   3. hit `knit PDF` to generate the html results file; this will create an HTML file but will not generate any data in memory
 
-#Documentation
+# Documentation
 Documentation is provided in several forms:
 * within `PCWG_share_01_main.rmd`
 * within `PCWG_share_01_main.pdf`, which will also contain the results when run using `knitr`.
 * within `PCWG_share_01_main.html`, which will also contain the results when run using `knitr`.
 
-#Reporting Bugs and Requesting Improvements
+# Reporting Bugs and Requesting Improvements
 Please use the [issue tracker](../../issues) to report problems or request improvements.
 
-#Wiki
+# Wiki
 Please use [the wiki](../../wiki) in this repository as you feel fit.
 
-#Comments
+# Comments
 This software is provided as is, with no guarantees.
 
-#Recent changes
+# Recent changes
 See /releases.
 
-#Code Maintainers
-* [Andy Clifton](mailto:andrew.clifton@nrel.gov) (National Renewable Energy Laboratory)
+# Code Maintainers
+* [Andy Clifton](mailto:clifton@windfors.de) WindForS Wind Energy Research Cluster
 
-#Project Contributors
+# Project Contributors
 * Peter Stuart, RES
