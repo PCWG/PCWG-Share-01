@@ -83,20 +83,17 @@ This script requires the _ggplot2_, _grid_, _knitr_, _RColorBrewer_, _rgdal_, _s
 
 ```{r load packages, message=FALSE, echo = FALSE}
 require(ggplot2)
+
+if(packageVersion("ggplot2") < "2.2.0") {
+    stop("Need package:ggplot2 2.2 or higher for labs function")
+}
+
 require(grid)
 require(XLConnect)
 require(knitr)
 require(reshape2)
 require(stringr)
 ```
-
-### WARNING
-Note that currently (September 21, 20216) the plots require the developer version of _ggplot2_. The github master of ggplot2 can be found at <https://github.com/hadley/ggplot2> . Installing this version requires the _devtools_ package. To install _devtools_ and the developer version of _ggplot2_, type:
-
-````{r install_dev_ggplot2, eval=FALSE, echo=TRUE}
-install.packages("devtools")
-devtools::install_github("hadley/ggplot2")
-````
 
 ## Directory structure
 
