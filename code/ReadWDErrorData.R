@@ -1,4 +1,4 @@
-ReadWDErrorData <- function(wb,sheet,sv){
+ReadWDErrorData <- function(wb,sheet,sv,data){
   # reads a PCWG Share 01 file and returns data about the baseline accuracy
   #
   # Args:
@@ -14,6 +14,9 @@ ReadWDErrorData <- function(wb,sheet,sv){
                     "0.5.8") <= 0){sr = 19}
   if(compareVersion(VersionStr(sv),
                     "0.5.8") > 0){sr = 27}
+
+  if(data.normalise_to_all){sr = sr + 38}
+  
   # get data...
   # By normalized wind speed bin
   bin = paste(as.character(readWorksheet(wb,

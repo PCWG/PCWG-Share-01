@@ -1,4 +1,4 @@
-ReadWSErrorData <- function(wb,sheet){
+ReadWSErrorData <- function(wb,sheet,data){
   # reads a PCWG Share 01 file and returns data about the baseline accuracy
   #
   # Args:
@@ -10,11 +10,14 @@ ReadWSErrorData <- function(wb,sheet){
   require(XLConnect)
   setMissingValue(wb," ")
   
+  sr = 7
+  if(data.normalise_to_all){sr = sr + 38}
+  
   # get data...
   # By normalized wind speed bin
   bin = paste(as.character(readWorksheet(wb,
                                          sheet = sheet,
-                                         region = "D7:R7",
+                                         region = paste0("D",sr,":R", sr),
                                          header = FALSE,
                                          autofitCol = FALSE,
                                          autofitRow= FALSE)),
@@ -22,7 +25,7 @@ ReadWSErrorData <- function(wb,sheet){
               sep=" ")
   data.count = paste(as.character(readWorksheet(wb,
                                                 sheet = sheet,
-                                                region = "D8:R8",
+                                                region = paste0("D",sr+1,":R", sr+1),
                                                 header = FALSE,
                                                 autofitCol = FALSE,
                                                 autofitRow= FALSE)),
@@ -30,7 +33,7 @@ ReadWSErrorData <- function(wb,sheet){
                      sep=" ")
   NME = paste(as.character(readWorksheet(wb,
                                          sheet = sheet,
-                                         region = "D9:R9",
+                                         region = paste0("D",sr+2,":R", sr+2),
                                          header = FALSE,
                                          autofitCol = FALSE,
                                          autofitRow= FALSE)),
@@ -38,7 +41,7 @@ ReadWSErrorData <- function(wb,sheet){
               sep=" ")
   NMAE = paste(as.character(readWorksheet(wb,
                                           sheet = sheet,
-                                          region = "D10:R10",
+                                          region = paste0("D",sr+3,":R", sr+3),
                                           header = FALSE,
                                           autofitCol = FALSE,
                                           autofitRow= FALSE)),

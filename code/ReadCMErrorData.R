@@ -1,4 +1,4 @@
-ReadCMErrorData <- function(wb,sheet,sv){
+ReadCMErrorData <- function(wb,sheet,sv,data){
   # reads a PCWG Share 01 file and returns data about the error
   #
   # Args:
@@ -14,6 +14,8 @@ ReadCMErrorData <- function(wb,sheet,sv){
                     "0.5.8") <= 0){sr = 15}
   if(compareVersion(VersionStr(sv),
                     "0.5.8") > 0){sr = 23}
+  
+  if(data.normalise_to_all){sr = sr + 38}
   
   # get data...
   # By calendar month

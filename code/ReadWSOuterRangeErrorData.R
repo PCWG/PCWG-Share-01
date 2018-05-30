@@ -1,4 +1,4 @@
-ReadWSOuterRangeErrorData <- function(wb,sheet){
+ReadWSOuterRangeErrorData <- function(wb,sheet,data){
   # reads a PCWG Share 01 file and returns data about the inner range
   #
   # Args:
@@ -9,12 +9,15 @@ ReadWSOuterRangeErrorData <- function(wb,sheet){
   
   require(XLConnect)
   setMissingValue(wb," ")
+
+  sr = 15
+  if(data.normalise_to_all){sr = sr + 38}
   
   # get data...
   # By normalized wind speed bin
   bin = paste(as.character(readWorksheet(wb,
                                          sheet = sheet,
-                                         region = "D15:R15",
+                                         region = paste0("D",sr,":R", sr),
                                          header = FALSE,
                                          autofitCol = FALSE,
                                          autofitRow= FALSE)),
@@ -22,7 +25,7 @@ ReadWSOuterRangeErrorData <- function(wb,sheet){
               sep=" ")
   data.count = paste(as.character(readWorksheet(wb,
                                                 sheet = sheet,
-                                                region = "D16:R16",
+                                                region = paste0("D",sr+1,":R", sr+1),
                                                 header = FALSE,
                                                 autofitCol = FALSE,
                                                 autofitRow= FALSE)),
@@ -30,7 +33,7 @@ ReadWSOuterRangeErrorData <- function(wb,sheet){
                      sep=" ")
   NME = paste(as.character(readWorksheet(wb,
                                          sheet = sheet,
-                                         region = "D17:R17",
+                                         region = paste0("D",sr+2,":R", sr+2),
                                          header = FALSE,
                                          autofitCol = FALSE,
                                          autofitRow= FALSE)),
@@ -38,7 +41,7 @@ ReadWSOuterRangeErrorData <- function(wb,sheet){
               sep=" ")
   NMAE = paste(as.character(readWorksheet(wb,
                                           sheet = sheet,
-                                          region = "D18:R18",
+                                          region = paste0("D",sr+3,":R", sr+3),
                                           header = FALSE,
                                           autofitCol = FALSE,
                                           autofitRow= FALSE)),

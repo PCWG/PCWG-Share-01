@@ -1,4 +1,4 @@
-ReadRangeErrorData <- function(wb,sheet,sv){
+ReadRangeErrorData <- function(wb,sheet,sv,data){
   # reads a PCWG Share 01 file and returns data about the error
   #
   # Args:
@@ -14,6 +14,8 @@ ReadRangeErrorData <- function(wb,sheet,sv){
                     "0.5.8") <= 0){sr = 23}
   if(compareVersion(VersionStr(sv),
                     "0.5.8") > 0){sr = 31}
+  
+  if(data.normalise_to_all){sr = sr + 38}
   
   # get data...
   # By range

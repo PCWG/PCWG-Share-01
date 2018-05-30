@@ -3,6 +3,14 @@ PlotAllErrorsByWSBin_BoxNWhiskers <- function(df,
                                               sw.version = "",
                                               sw.version.logic="equals",
                                               ouput.dir = file.path(getwd(),'analysis','all')){
+  
+  if (data.normalise_to_all)
+  {
+    limits = c(-15,15)
+  }else{
+    limits = c(-5,5)
+  }
+  
   # plots errors in a PCWG Share 01 file by normalized wind speed bin
   #
   # Args:
@@ -90,7 +98,7 @@ PlotAllErrorsByWSBin_BoxNWhiskers <- function(df,
           guides(colour = FALSE) +
           scale_x_discrete(name = "Normalized Wind Speed (binned)") +
           scale_y_continuous(name = "Normalized Mean Error (Predicted - Actual, %)",
-                             limits =c(-15,15)) +
+                             limits = limits) +
           theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
           labs(title = plot.title) +
           labs(subtitle = plot.subtitle) + 
@@ -105,7 +113,7 @@ PlotAllErrorsByWSBin_BoxNWhiskers <- function(df,
         scale_x_discrete(name = "Normalized Wind Speed (binned)",
                          drop = FALSE) +
         scale_y_continuous(name = "Normalized Mean Error (Predicted - Actual, %)",
-                           limits =c(-15,15)) +
+                           limits = limits) +
         theme(axis.text.x = element_text(angle = 45, hjust = 1)) + 
         labs(title = plot.title) +
         labs(subtitle = plot.subtitle) + 

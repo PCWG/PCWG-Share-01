@@ -25,7 +25,7 @@ The following user inputs were used in the preparation of this document:
 
 ```{r user-defined options}
 # Where can files be found?
-project.root <- file.path('/Users/aclifton/Documents/confidential/projects/PCWG Share 01')
+project.root <- file.path('/Users/stuart/PCWG-Share-01')
 
 # Who ran this script
 made.by = "A. Clifton, NREL"
@@ -33,12 +33,17 @@ made.by = "A. Clifton, NREL"
 # Will data be public or not?
 data.public = TRUE
 
+#change setting below to toggle normalisation 
+# FALSE = Normalise to energy in bin (may overstate errors in low wind speed bins)
+# TRUE = Normalise to energy in dataset
+data.normalise_to_all = TRUE
+
 # Reanalyze existing data?
-data.analyze.raw = FALSE
+data.analyze.raw = TRUE
 
 # software version to use:
 # version string in "x.x.x" format
-sw.version = "0.6.0"
+sw.version = "0.8.0"
 # should we use versions less, equal, or greater than that?
 sw.version.logic = "from" 
 # options are "to" (<=), "equals" (==), or "from" (>=).
@@ -48,7 +53,7 @@ sw.version.logic = "from"
 # will be ignored if "" is used
 # use data versions in the form "x.x.x". 
 # Note that this may conflict with some code
-data.version.earliest ="0.6.0"
+data.version.earliest ="0.8.0"
 ```
 
 Note that _data.version.earliest_ is used to limit the data that are processed; data before this version number will not be used. In this document, _data.version.earliest_ was set to  `cat('"',data.version.earliest,'"')`. Also, a major change in data processing occurred in version 0.5.9 of the PCWG tool. Therefore, the functions used in the preparation of this document have two inputs (_sw.version_ and _sw.version.logic_) that can be used to select the data that are used for each plot.
@@ -81,13 +86,9 @@ if (data.analyze.raw == FALSE){
 ### Standard Packages
 This script requires the _ggplot2_, _grid_, _knitr_, _RColorBrewer_, _rgdal_, _stringr_, and _XLConnect_ packages to run. These are called from the script but you may need to install them directly. For details of how to install packages, see the RStudio help. 
 
+
 ```{r load packages, message=FALSE, echo = FALSE}
 require(ggplot2)
-
-if(packageVersion("ggplot2") < "2.2.0") {
-    stop("Need package:ggplot2 2.2 or higher for labs function")
-}
-
 require(grid)
 require(XLConnect)
 require(knitr)
@@ -95,11 +96,20 @@ require(reshape2)
 require(stringr)
 ```
 
+### WARNING
+Note that currently (September 21, 20216) the plots require the developer version of _ggplot2_. The github master of ggplot2 can be found at <https://github.com/hadley/ggplot2> . Installing this version requires the _devtools_ package. To install _devtools_ and the developer version of _ggplot2_, type:
+
+````{r install_dev_ggplot2, eval=FALSE, echo=TRUE}
+install.packages("devtools")
+devtools::install_github("hadley/ggplot2")
+````
+
 ## Directory structure
 
 ```{r define file locations, message=FALSE, echo = FALSE}
 # define the working directory
 working.dir <- project.root
+
 setwd(working.dir)
 
 #identify data directory
@@ -128,8 +138,8 @@ The folowing files should be placed in the _project.root_ directory:
 
 ```{r configure graphics, message=FALSE, echo = FALSE}
 # configure graphics appearance
-theme_set(theme_PCWG(base_size = 8, 
-               base_family = "sans"))
+#theme_set(theme_PCWG(base_size = 8, 
+#               base_family = "sans"))
 ```
 
 # Results from each data set
@@ -156,6 +166,7 @@ if (data.analyze.raw == TRUE){
     # open the excel sheet
     wb <- loadWorkbook(file.path(data.dir,data.file))
     # read the submission data
+
     in.sub <- ReadSubmissionData(wb)
     in.sub$data.file <- data.file
     # check the version
@@ -202,7 +213,7 @@ if (data.analyze.raw == TRUE){
       # read *all* errors
       in.errors <- ReadErrorData(wb,
                                  in.sub$sw.version)
-      
+
       if (data.public == FALSE){
         # write out results from this case to file and to the document  
         cat(text = "\n## Data set", in.sub$random.ID, "from", data.file, "\n")
@@ -299,11 +310,11 @@ Data suppliers were categorized according to the role they play in the wind indu
 * Original Equipment Manufacturers (OEMs): design, manufature, and maintain wind turbines 
 
 ```{r Histogram of data supplier types, echo=FALSE, fig.width = 6.5, fig.height = 3.5, fig.cap="Data Sources"}
-PlotAllDataSuppliers(all.data$meta,
-                     sw.version = sw.version,
-                     sw.version.logic = sw.version.logic,
-                     output.dir,
-                     made.by)
+#PlotAllDataSuppliers(all.data$meta,
+#                     sw.version = sw.version,
+#                     sw.version.logic = sw.version.logic,
+#                     output.dir,
+#                     made.by)
 ``` 
 
 ## Turbine Sizes
